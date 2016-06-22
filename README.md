@@ -240,12 +240,12 @@ Also handy: If you need to generate an access token on your Particle device, you
 
 
 ## Receiving Complex Data
-While webhooks can return larger response data in multiple pieces, this is a pain to deal with on the Photon or Electron. Fortunately, you can use mustache templates to parse a JSON response returned by the server and only return the data you're interested in. You can also use it to turn response data into easier to parse forms, like comma-separated values.
+While webhooks can return larger response data in multiple pieces, this is a pain to deal with on the Photon or Electron. Fortunately, you can use mustache templates to parse a JSON response returned by the server and only return the data you're interested in. You can also use it to turn response data into easier to parse formats, like comma-separated values.
 
 
 ## Example: Google Elevation API
 
-This is an good example of using mustache templates in both the request and response. It uses the [Google Maps Elevation API] (https://developers.google.com/maps/documentation/elevation/start) to do a simple query.
+This is an example of using mustache templates in both the request and response. It uses the [Google Maps Elevation API] (https://developers.google.com/maps/documentation/elevation/start) to do a simple query.
 
 According to the Google documentation, you make a request like this:
 
