@@ -150,7 +150,7 @@ We were actually using mustache in the example above:
 
 The `{{PARTICLE_EVENT_VALUE}}` is a mustache template to include the event value in the data. It's automatically replaced by the event value when the template is processed.
 
-The other values you can use are: ``{{PARTICLE_DEVICE_ID}}`` and ``{{PARTICLE_PUBLISHED_AT}}`.
+The other values you can use are: `{{PARTICLE_DEVICE_ID}}` and `{{PARTICLE_PUBLISHED_AT}}`.
 
 But that's a really simple example. We can do powerful parsing of JSON data, which will be discussed below in the topics on sending and receiving of JSON data. 
 
@@ -234,7 +234,7 @@ This will sent the data up to the cloud formatted like this:
 {"lat":39.73915360, "lng":-104.98470340}
 ```
 
-Then, in your query and json web hook templates, you can now use `{{lat}}` and `{{lng}}` Mustache variables to access the values of those fields! 
+Then, in your query and json web hook templates, you can now use `{{lat}}` and `{{lng}}` Mustache variables to access the values of those fields.
 
 Also handy: If you need to generate an access token on your Particle device, you can pass it up along with other data in JSON format, then include it in an Authorization header or in a URL query parameter using Mustache.
 
