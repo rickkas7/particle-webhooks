@@ -77,7 +77,7 @@ The full list of fields available in the Custom JSON are in the [cloud API docum
 
 
 ## Debugging with RequestBin
-Depending on the service you're sending data to, it can be difficult to debug a webhook, especially if you're using sending data using templates. A great debugging tool is the free service [http://requestb.in/] (http://requestb.in/). You create a new RequestBin and it returns a URL that you use as the URL in your web hook. Then, when you refresh you RequestBin page, it will show you the requests that have come in, with all of the parameters and data. Very handy!
+Depending on the service you're sending data to, it can be difficult to debug a webhook, especially if you're using sending data using templates. A great debugging tool is the free service [http://requestb.in/] (http://requestb.in/). You create a new RequestBin and it returns a URL that you use as the URL in your webhook. Then, when you refresh you RequestBin page, it will show you the requests that have come in, with all of the parameters and data. Very handy!
 
 Here's a simple webhook JSON file. I saved it in a file "hook1.json".
 
@@ -154,7 +154,7 @@ The other values you can use are: `{{PARTICLE_DEVICE_ID}}` and `{{PARTICLE_PUBLI
 
 But that's a really simple example. We can do powerful parsing of JSON data, which will be discussed below in the topics on sending and receiving of JSON data. 
 
-Lets say you have this JSON data:
+Let's say you have this JSON data:
 
 ```
 {
@@ -206,6 +206,15 @@ The template below is not valid. Even if the event value is a number once the su
 	"value": {{PARTICLE_EVENT_VALUE}}
 },
 ```
+
+It must always be in a string:
+
+```
+"json": {
+	"value": "{{PARTICLE_EVENT_VALUE}}"
+},
+```
+
 For this reason, it's essentially impossible to use the Mustache iteration features (like `{{#values}}`) in your Custom JSON, as well.
 
 Incidentally, it's called mustache because of the use of curly brackets, which sort of look like a mustache turned sideways.
@@ -234,7 +243,7 @@ This will sent the data up to the cloud formatted like this:
 {"lat":39.73915360, "lng":-104.98470340}
 ```
 
-Then, in your query and json web hook templates, you can now use `{{lat}}` and `{{lng}}` Mustache variables to access the values of those fields.
+Then, in your query and json webhook templates, you can now use `{{lat}}` and `{{lng}}` Mustache variables to access the values of those fields.
 
 Also handy: If you need to generate an access token on your Particle device, you can pass it up along with other data in JSON format, then include it in an Authorization header or in a URL query parameter using Mustache.
 
@@ -271,7 +280,7 @@ And you get a response back in JSON, like this:
 }
 ```
 
-Hook defintion (hook.json):
+Hook definition (hook.json):
 
 ```
 {
