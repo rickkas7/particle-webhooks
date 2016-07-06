@@ -217,6 +217,8 @@ It must always be in a string:
 
 For this reason, it's essentially impossible to use the Mustache iteration features (like `{{#values}}`) in your Custom JSON, as well.
 
+You can use Mustache templates in the url, query, json and form elements.
+
 Incidentally, it's called mustache because of the use of curly brackets, which sort of look like a mustache turned sideways.
 
 
