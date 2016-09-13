@@ -360,4 +360,37 @@ And what it looks like in the event log in the dashboard:
 
 ![Event Log](eventlog.png)
 
+## Other examples
 
+### Sending Particle GPS data to Ubidots
+
+Particle code:
+```
+// doWeHaveGpsFix() is a function to show if the GPS has a fix or not 
+locationStream  = "{\"fix\":" + String(doWeHaveGpsFix()) + ", \"context\":{\"lat\":" + gps.latitudeDegrees + ", \"lng\":" + gps.longitudeDegrees + "}}";
+Particle.publish("G", locationStream, 60, PRIVATE);
+
+```
+Webhook JSON:
+```
+{
+    "event": "G",
+    "url":
+"http://things.ubidots.com/api/v1.6/devices/{{PARTICLE_DEVICE_ID}}?token=PUT_YOUR_TOKEN_HERE",
+    "headers": {
+                "X-Auth-Token": "TOKEN"
+              },
+    "requestType": "POST",
+    "mydevices": true,
+	"noDefaults": true,
+    "json":{
+		"fix": {
+			"value": "{{fix}}",
+			"context": {
+				"lat": "{{context.lat}}",
+				"lng": "{{context.lng}}"
+			}
+		}
+	}
+}
+```
