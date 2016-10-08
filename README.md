@@ -361,3 +361,22 @@ And what it looks like in the event log in the dashboard:
 ![Event Log](eventlog.png)
 
 
+## Example: Google Firebase
+
+I created a separate tutorial for using Google Firebase and webhooks for storing data from Photons, Electrons, etc..
+
+There are three examples in the tutorial:
+
+- Saving data in a table
+- Saving data in a per-device table
+- Saving data from a device and retrieving it from another device
+
+You don’t need your own server; it’s all done with webhooks and the regular Google Firebase API. And if you don’t have much data to exchange, you may be able to use the free tier forever.
+
+Also, it demonstrates using mustache templates and separating data by device name.
+
+[https://github.com/rickkas7/firebase_tutorial] (https://github.com/rickkas7/firebase_tutorial)
+
+
+
+
