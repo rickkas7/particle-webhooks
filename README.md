@@ -4,6 +4,7 @@ Particle webhooks are a great way to integrate your Particle Photon or Electron 
 
 Before we get too far, this tutorial assumes you're familar with [JSON files] (http://www.w3schools.com/json/). JSON is a text-based data exchange format for passing data between devices or to and from APIs. As a refresher, the link at the beginning of this paragraph may be helpful.
 
+**Updated March 3, 2017:** There is now information on using the body feature, which allows much more complicated Mustache variable declarations and JSON data structures. 
 
 ## Using the Webhook Builder
 The basics of the webhook builder are described in the [documentation] (https://docs.particle.io/guide/tools-and-features/webhooks/) but I'll include a few handy tips here.
@@ -195,11 +196,16 @@ template: {{c.1.cb}}
 result:   456
 ```
 
+You can test these out yourself using the Mustache Tester described below. It can greatly simplify making mustache definitions!
+
 In other words, you separate nested elements by "." and access array elements by just using their array index (0-based).
 
-If you're already familiar with mustache, there are some additional restrictions that don't apply to generic mustache templates used in, say, HTML. The hook JSON template must itself be valid JSON.
+If you're encoding strings that may contain HTML special characters like angle brackets, ampersand, and some other characters, you may need to use a triple curly bracket like `{{{b}}}` instead. This is described below.
 
-The template below is not valid. Even if the event value is a number once the substition is complete, and would be valid then, you still cannot do this because the template itself is not valid JSON *before* substitution. **Don't do this:**
+
+If you're already familiar with mustache, there are some additional restrictions that don't apply to generic mustache templates used in, say, HTML. The hook JSON template must itself be valid JSON. You can get around these limitations by using the body, described below.
+
+The template below is not valid in the json section. Even if the event value is a number once the substition is complete, and would be valid then, you still cannot do this because the template itself is not valid JSON *before* substitution. **Don't do this:**
 
 ```
 "json": {
@@ -215,11 +221,430 @@ It must always be in a string:
 },
 ```
 
-For this reason, it's essentially impossible to use the Mustache iteration features (like `{{#values}}`) in your Custom JSON, as well.
+However, there is a workaround that can be used to get around this limitation by using the body definition, described in the next section.
 
-You can use Mustache templates in the url, query, json and form elements.
+You can use Mustache templates in the url, query, json, form, and body elements.
 
 Incidentally, it's called mustache because of the use of curly brackets, which sort of look like a mustache turned sideways.
+
+## Using the body definition
+
+In addition to `json` and `form` to specify the body of a POST (or PUT) method, you can also use `body`. The body allows free-form definition of the data. This is useful if your server requires a different, non-JSON and non-form format, but we'll be using it here to output complex JSON data.
+
+You currently can only use a body definition from a webhook in a file using the Particle CLI. You can't enter one into the console.
+
+In these examples we'll be using the body definition to send complex JSON data to a server. You may want to add a content type definition so your knows you're sending JSON data.
+
+```
+    "headers": {
+    	"Content-Type": "text/json"
+    },
+```
+
+Here's an example webhook:
+
+```
+{
+    "event": "test1",
+    "url": "http://requestb.in/195kr671",
+    "requestType": "POST",
+    "mydevices": true,
+    "noDefaults":false,
+    "body":"{\"a\":{{a}}}"
+}
+```
+
+Note that the body parameter is JSON-escaped string string. This means that you need to enclose it in double quotes, and escape any double quotes in your string. This results in a slightly confusing mess:
+
+```
+    "body":"{\"a\":{{a}}}"
+```
+
+It's better to think of these definitions in the unescaped version. I also added a spaces to make it clearer:
+
+```
+{ "a":{{a}} }
+```
+
+This solves the numbers in the JSON data problem above. If a is a number, you get an actual number. This works for integers and floating point numbers. If your Photon was sending the following data in a publish:
+
+```
+{"a":1234.5, "b":"abcdef"}
+```
+
+The webhook request body would contain:
+
+```
+{"a":1234.5}
+```
+
+While you can use this technique for strings, it's only practical for simple strings. For example:
+
+```
+{ "a":"{{a}}" }
+```
+
+This works fine if you pass in a simple string:
+
+```
+particle publish test1 '{"a":"xxx"}' --private
+```
+
+But if your string contains backslashes or double quotes, things start to go downhill quickly, since the body processor doesn't know it's generating JSON, it doesn't know how to escape the special JSON characters and will likely just give up and pass an empty string to the webhook.
+
+Also, in many cases, you want want to use triple-curly brackets instead. The reason is that Mustache by default HTML-escapes strings, which is almost never what you want when creating JSON.
+
+```
+particle publish test1 '{"a":"<x>"}' --private
+```
+
+with the template above produces:
+
+```
+{"a":"&lt;x&gt;"}
+```
+
+If you use triple curly brackets
+
+```
+{ "a":"{{{a}}}" }
+```
+
+You get the expected:
+
+```
+{"a":"<x>"}
+```
+
+This affects anything that will be HTML escaped, like angle brackets, the ampersand, and sometimes some characters like double quotes that get converted to HTML entities like `&quot;`.
+
+### Expanding key names
+
+Sometimes you'll be interfacing with an API that has verbose keys. Google likes to do this. The problem is that publishes are limited to 255 characters, and sometimes you can run out of room if you compose the JSON on the Photon/Electron. Instead, you can use mustache templates to expand key names.
+
+In this fragment of body template (without the escaping of double quotes)
+
+```
+{"cellId":{{i}},"locationAreaCode":{{l}},"mobileCountryCode":{{c}},"mobileNetworkCode":{{n}} }
+```
+
+You'd send up in your publish data like:
+
+```
+{"i":1234,"l":567,"c":890,"n":765}
+```
+
+and the template would convert it to:
+
+```
+{"cellId":1234,"locationAreaCode":567,"mobileCountryCode":890,"mobileNetworkCode":765}
+```
+
+Remember that double quotes need to escaped in your webhook JSON, so it will look more like this in your webhook JSON file:
+
+```
+"body":"{\"cellId\":{{i}},\"locationAreaCode\":{{l}},\"mobileCountryCode\":{{c}},\"mobileNetworkCode\":{{n}} }"
+```
+
+### Passing pre-formatted objects
+
+Sometimes you might want to pre-encode part of your JSON webhook data. A good reason is that you have a variable-length array of data, but it can be used for objects as well.
+
+Say you're passing the following up via publish:
+
+```
+{"a":[123,456,789]}
+```
+
+And you use this Mustache template in your webhook body (before string escaping):
+
+```
+{"anArray":[{{a}}]}
+```
+
+Then the output would be:
+
+```
+{
+    "anArray": [
+        123,
+        456,
+        789
+    ]
+}
+```
+
+The other reason you might want to do this is to mix in some pre-defined things, like:
+
+```
+{"anArray":[{{a}}], "id":"{{PARTICLE_DEVICE_ID}}"}
+```
+
+This would output:
+
+```
+{
+    "anArray": [
+        123,
+        456,
+        789
+    ],
+    "id": "12345678901234567890abcd"
+}
+```
+
+You can also use this technique to implement a "zero or more" option. Using the same template above, this input:
+
+```
+{"a":123}
+```
+
+Generates a valid JSON array in the output:
+
+```
+{
+    "anArray": [
+        123
+    ],
+    "id": "12345678901234567890abcd"
+}
+```
+
+And if there is no a property at all, then you get an empty array.
+
+
+### Body with conditional blocks
+
+Conditional blocks can be used for optional objects. This would allow you to use a single webhook for multiple functions.
+
+If you have this published value:
+
+```
+{"a":123,"b":{"c":"hello","d":false}}
+```
+
+And this mustache template:
+
+```
+{ "cat":"{{b.c}}", "dog":{{b.d}}, "apple":{{a}} }
+```
+
+You get this JSON output:
+
+```
+{
+    "cat": "hello",
+    "dog": false,
+    "apple": 123
+}
+```
+
+Using a conditional block, you can also implement it using this mustache template:
+
+```
+{
+	{{#b}}
+		"cat":"{{c}}", 
+		"dog":{{d}}, 
+	{{/b}}
+	"apple":{{a}} 
+}
+```
+
+This generates the same output as above. The `{{#b}}` tests if b exists and if it does, includes the statements until the `{{/b}}`. Also, any mustache variables within the block are relative to b. That's why cat is `{{c}}` in this example and `{{b.c}}` in the example before that.
+
+The real difference is when you only publish this:
+
+```
+{"a":123}
+```
+
+The output won't have any references to the cat and dog at all:
+
+```
+{
+    "apple": 123
+}
+```
+
+### Body with arrays
+
+This technique can also be used to handle arrays of varying size, with certain caveats and some annoying complexity.
+
+The data you pass up by publish contains a JSON object, which contains a JSON array, which contains more objects. The length of the array may vary.
+
+```
+{"a":[{"b":123,"c":true},{"b":456,"c":false}] }
+```
+
+And you have this template:
+
+```
+{
+	"array":[
+		{{#a}}
+		{
+			"banana":{{b}},
+			"capybara":{{c}}
+		},
+		{{/a}}
+		{}
+	]
+}
+```
+
+Like the conditional block example above, this template uses `{{#a}}`. However, since it's an array, the text until `{{/a}}` is repeated once for every element in the array. This allows for easy expansion of objects contained in an array.
+
+And this is what gets generated:
+
+```
+{
+    "array": [
+        {
+            "banana": 123,
+            "capybara": true
+        },
+        {
+            "banana": 456,
+            "capybara": false
+        },
+        {            
+        }
+    ]
+}
+```
+
+Unfortunately, there's a problem. Because mustache was designed to generate HTML, not JSON, it doesn't really know what to do about the comma separator needed between JSON array elements.
+
+There are three ways to deal with this:
+
+* Leave the extra comma after the last element. 
+
+If the template had been this:
+
+```
+{
+	"array":[
+		{{#a}}
+		{
+			"banana":{{b}},
+			"capybara":{{c}}
+		},
+		{{/a}}
+	]
+}
+```
+
+You'd get this:
+
+```
+{
+    "array": [
+        {
+            "banana": 123,
+            "capybara": true
+        },
+        {
+            "banana": 456,
+            "capybara": false
+        },
+    ]
+}
+```
+
+Note the comma before the ]. This isn't valid JSON, but the thing you're sending your webhook data to may be OK with it, and if so then you're set.
+
+* Add an empty element
+
+That's what's done above. Each array element ends with a comma, but then there's an element with no data at the end. Some servers may be OK with this, which is valid JSON, but weird data.
+
+```
+		},
+		{{/a}}
+		{}
+```
+
+* Duplicate the first element again
+
+```
+{
+	"array":[
+		{{#a}}
+		{
+			"banana":{{b}},
+			"capybara":{{c}}
+		},
+		{{/a}}
+		{
+			"banana":{{a.0.b}},
+			"capybara":{{a.0.c}}
+		}
+	]
+}
+```
+
+This outputs:
+
+```
+{
+    "array": [
+        {
+            "banana": 123,
+            "capybara": true
+        },
+        {
+            "banana": 456,
+            "capybara": false
+        },
+        {
+            "banana": 123,
+            "capybara": true
+        }
+    ]
+}
+```
+
+I used this technique with the Google geolocation API, which doesn't like the first two methods, but does not mind the duplicated element.
+
+## Using the Mustache Tester
+
+The syntax of mustache is obscure enough that you'll probably want to use the mustache tester instead of creating webhook after webhook trying to get it right. 
+
+The tester is written in Javascript, runs entirely in your web browser, and is here:
+
+[http://rickkas7.github.io/mustache/](http://rickkas7.github.io/mustache/)
+
+- Enter JSON data to parse
+
+Paste your JSON data into this box. Typically this is a JSON object, like this:
+
+```
+{"a":1234.5, "b":"abcdef"}
+```
+
+It can also be an array, or a complex object, with a mix of objects and arrays.
+
+- Show formatted JSON data
+
+If you select the checkbox a formatted version of the JSON data is displayed. This is handy if your JSON is all in one line and contains nested objects and arrays. It expands these out so it's much easier to see the nesting.
+
+- Enter a mustache template to test
+
+Paste your mustache template here. 
+
+- Processed template and data
+
+If you have valid JSON data and a valid mustache template, this is the result. If you were creating a webhook, this is what would be in the JSON body. It doesn't have to be JSON, however. If you are using a response template you might want to use something simpler like comma-separated values, for example.
+
+- Processed template and data, as formatted JSON
+
+If the processed template and data are valid JSON, the formatted version is put here. This is a good sanity test to make sure you are generating valid JSON, assuming that's what you're aiming for.
+
+- String-escaped version of the template
+
+When using the body definition you may find this useful. It does the escaping of double quotes so you can paste it right into your webhook JSON file. 
+
+The checkbox below enables or disables removing CR, LF and tab from the string-escaped template. Normally they're not necessary in the body template, and this makes it easier to paste readable text in the box and get a more compact representation
 
 
 ## Sending Complex Data
