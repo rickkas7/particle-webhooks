@@ -346,10 +346,9 @@ Remember that double quotes need to escaped in your webhook JSON, so it will loo
 "body":"{\"cellId\":{{i}},\"locationAreaCode\":{{l}},\"mobileCountryCode\":{{c}},\"mobileNetworkCode\":{{n}} }"
 ```
 
-### Passing pre-formatted objects
+### Passing pre-formatted arrays
 
-Sometimes you might want to pre-encode part of your JSON webhook data. A good reason is that you have a variable-length array of data, but it can be used for objects as well.
-
+Sometimes you might want to pre-encode part of your JSON webhook data. A good reason is that you have a variable-length array of data.
 Say you're passing the following up via publish:
 
 ```
