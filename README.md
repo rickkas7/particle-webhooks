@@ -627,6 +627,8 @@ It can also be an array, or a complex object, with a mix of objects and arrays.
 
 If you select the checkbox a formatted version of the JSON data is displayed. This is handy if your JSON is all in one line and contains nested objects and arrays. It expands these out so it's much easier to see the nesting.
 
+If you click on a row of formatted JSON, it displays the Mustache template you can use to extract that data. The **Copy To Template** button will append that selector to your template.
+
 - Enter a mustache template to test
 
 Paste your mustache template here. 
