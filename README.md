@@ -1,13 +1,13 @@
 # Particle Webhooks Intermediate Tutorial
 
-Particle webhooks are a great way to integrate your Particle Photon or Electron with APIs for web services on the Internet. If you're new to webhooks, you should start at [the official Particle guide for webhooks] (https://docs.particle.io/guide/tools-and-features/webhooks/) before continuing on here.
+Particle webhooks are a great way to integrate your Particle Photon or Electron with APIs for web services on the Internet. If you're new to webhooks, you should start at [the official Particle guide for webhooks](https://docs.particle.io/guide/tools-and-features/webhooks/) before continuing on here.
 
-Before we get too far, this tutorial assumes you're familar with [JSON files] (http://www.w3schools.com/json/). JSON is a text-based data exchange format for passing data between devices or to and from APIs. As a refresher, the link at the beginning of this paragraph may be helpful.
+Before we get too far, this tutorial assumes you're familar with [JSON files](http://www.w3schools.com/json/). JSON is a text-based data exchange format for passing data between devices or to and from APIs. As a refresher, the link at the beginning of this paragraph may be helpful.
 
 **Updated March 3, 2017:** There is now information on using the body feature, which allows much more complicated Mustache variable declarations and JSON data structures. 
 
 ## Using the Webhook Builder
-The basics of the webhook builder are described in the [documentation] (https://docs.particle.io/guide/tools-and-features/webhooks/) but I'll include a few handy tips here.
+The basics of the webhook builder are described in the [documentation](https://docs.particle.io/guide/tools-and-features/webhooks/) but I'll include a few handy tips here.
 
 I'll also include the mappings between the fields in the webhook builder and the Custom JSON file here, even though the Custom JSON option is the next section. If you're curious, you can jump ahead and come back. 
 
@@ -68,17 +68,17 @@ The *enforce SSL* option determines, for https URLs, whether to validate the ser
 
 
 ## Using Custom JSON
-All of the information included in the webhook builder can be described in a single [JSON file] (http://www.w3schools.com/json/). This file can be pasted into the Custom JSON field in the web user interface, or it can be set using the Particle [Command Line Interface] (https://docs.particle.io/guide/tools-and-features/cli/photon/) (CLI).
+All of the information included in the webhook builder can be described in a single [JSON file](http://www.w3schools.com/json/). This file can be pasted into the Custom JSON field in the web user interface, or it can be set using the Particle [Command Line Interface](https://docs.particle.io/guide/tools-and-features/cli/photon/) (CLI).
 
-I prefer to use the Particle CLI because I can easily keep multiple versions of my webhooks in files on my computer and upload them with a [single command] (https://docs.particle.io/reference/cli/#particle-webhook-create).
+I prefer to use the Particle CLI because I can easily keep multiple versions of my webhooks in files on my computer and upload them with a [single command](https://docs.particle.io/reference/cli/#particle-webhook-create).
 
 One thing to beware of: uploading a hook again doesn't delete an older hook with the same eventName. And having multiple hooks triggering on the same event name can cause massive confusion. Make sure you delete the old hook first if you intended to replace it!
 
-The full list of fields available in the Custom JSON are in the [cloud API documentation] (https://docs.particle.io/reference/api/#create-a-webhook).
+The full list of fields available in the Custom JSON are in the [cloud API documentation](https://docs.particle.io/reference/api/#create-a-webhook).
 
 
 ## Debugging with RequestBin
-Depending on the service you're sending data to, it can be difficult to debug a webhook, especially if you're using sending data using templates. A great debugging tool is the free service [http://requestb.in/] (http://requestb.in/). You create a new RequestBin and it returns a URL that you use as the URL in your webhook. Then, when you refresh you RequestBin page, it will show you the requests that have come in, with all of the parameters and data. Very handy!
+Depending on the service you're sending data to, it can be difficult to debug a webhook, especially if you're using sending data using templates. A great debugging tool is the free service [http://requestb.in/](http://requestb.in/). You create a new RequestBin and it returns a URL that you use as the URL in your webhook. Then, when you refresh you RequestBin page, it will show you the requests that have come in, with all of the parameters and data. Very handy!
 
 Here's a simple webhook JSON file. I saved it in a file "hook1.json".
 
@@ -682,7 +682,7 @@ While webhooks can return larger response data in multiple pieces, this is a pai
 
 ## Example: Google Elevation API
 
-This is an example of using mustache templates in both the request and response. It uses the [Google Maps Elevation API] (https://developers.google.com/maps/documentation/elevation/start) to do a simple query.
+This is an example of using mustache templates in both the request and response. It uses the [Google Maps Elevation API](https://developers.google.com/maps/documentation/elevation/start) to do a simple query.
 
 According to the Google documentation, you make a request like this:
 
@@ -801,7 +801,7 @@ You don’t need your own server; it’s all done with webhooks and the regular 
 
 Also, it demonstrates using mustache templates and separating data by device name.
 
-[https://github.com/rickkas7/firebase_tutorial] (https://github.com/rickkas7/firebase_tutorial)
+[https://github.com/rickkas7/firebase_tutorial](https://github.com/rickkas7/firebase_tutorial)
 
 
 
