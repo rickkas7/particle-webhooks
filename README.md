@@ -203,7 +203,7 @@ In other words, you separate nested elements by "." and access array elements by
 If you're encoding strings that may contain HTML special characters like angle brackets, ampersand, and some other characters, you may need to use a triple curly bracket like `{{{b}}}` instead. This is described below.
 
 
-If you're already familiar with mustache, there are some additional restrictions that don't apply to generic mustache templates used in, say, HTML. The hook JSON template must itself be valid JSON. You can get around these limitations by using the body, described below.
+If you're already familiar with mustache, there are some additional restrictions that don't apply to generic mustache templates used in, say, [HTML](https://www.scaler.com/topics/html/). The hook JSON template must itself be valid JSON. You can get around these limitations by using the body, described below.
 
 The template below is not valid in the json section. Even if the event value is a number once the substition is complete, and would be valid then, you still cannot do this because the template itself is not valid JSON *before* substitution. **Don't do this:**
 
